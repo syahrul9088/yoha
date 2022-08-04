@@ -69,28 +69,34 @@ const functionRegister = (randIp, nomor, reffCode, otp) => new Promise((resolve,
 });
 
 (async () => {
-    try {
-        const randIp = `${randomize('0', 3)}.${randomize('0', 3)}.${randomize('0', 2)}.${randomize('0', 2)}`
-        const reffCode = readline.question("Kode reff : ")
-        const nomor = readline.question('Nomor (ex: 819XXXX): ')
+    var reffCode = readline.question("Kode reff : ")
+    var jmlReff = readline.question("Jumlah reff: ")
 
-        const sendOtp = await functionSendOtp(randIp, nomor)
-        if(sendOtp.status == 'success'){
-            console.log("OTP berhasil dikirim")
-            const otp = readline.question("OTP : ")
-            const register = await functionRegister(randIp, nomor, reffCode, otp)
-            if(register.status == 'success'){
-                console.log("Reff sukses")
-                console.log("")
+    console.log("")
+
+    for(var i = 0; i < jmlReff; i++){
+        try {
+            const randIp = `${randomize('0', 3)}.${randomize('0', 3)}.${randomize('0', 2)}.${randomize('0', 2)}`
+            const nomor = readline.question('Nomor (ex: 819XXXX): ')
+    
+            const sendOtp = await functionSendOtp(randIp, nomor)
+            if(sendOtp.status == 'success'){
+                console.log("OTP berhasil dikirim")
+                const otp = readline.question("OTP : ")
+                const register = await functionRegister(randIp, nomor, reffCode, otp)
+                if(register.status == 'success'){
+                    console.log("Reff sukses")
+                    console.log("")
+                } else {
+                    console.log("Reff gagal")
+                    console.log("")
+                }
             } else {
-                console.log("Reff gagal")
+                console.log("OTP gagal dikirim")
                 console.log("")
             }
-        } else {
-            console.log("OTP gagal dikirim")
-            console.log("")
+        } catch (error) {
+            console.log(error);
         }
-    } catch (error) {
-        console.log(error);
     }
 })();
