@@ -1,6 +1,5 @@
 const fetch = require('node-fetch')
 var randomize = require('randomatic');
-const crypto = require('crypto');
 const readline = require('readline-sync');
 
 const functionLogin = (randIp, nomor) => new Promise((resolve, reject) => {
@@ -83,6 +82,70 @@ const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, rejec
    .catch(err => reject(err))
 });
 
+const functionGetDetailUserLive = (randIp, token) => new Promise((resolve, reject) => {
+    const bodys = {
+        "ip":randIp,
+        "v":"2.0.7.2",
+        "l":"in"
+    }
+
+    fetch(`https://tech04.yoha.pro/live/list?type=0&page=1&per_page=9&ip=${randIp}&v=2.0.7.2&l=in`, { 
+        method: 'POST', 
+        body: JSON.stringify(bodys),
+        headers: {
+            'X-Forwarded-For': `${randIp}`,
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
+            'Content-Length': 47,
+            'Host': 'tech04.yoha.pro',
+            'Connection': 'Keep-Alive',
+            'Accept-Encoding': 'gzip',
+            'User-Agent': 'okhttp/5.0.0-alpha.2'
+        }
+   })
+   .then(res => res.json())
+   .then(result => {
+       resolve(result);
+   })
+   .catch(err => reject(err))
+});
+
+const functionSendGift = (randIp, token, streamId, liveId) => new Promise((resolve, reject) => {
+    const bodys = {
+        "gift_id":"3",
+        "num":"1",
+        "type":"0",
+        "combo":"false",
+        "stream":streamId,
+        "live_uid":liveId,
+        "ip":randIp,
+        "v":"2.0.7.2",
+        "l":"in"
+    }
+
+    fetch(`https://tech04.yoha.pro/live/sendGift`, { 
+        method: 'POST', 
+        body: JSON.stringify(bodys),
+        headers: {
+            'X-Forwarded-For': `${randIp}`,
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
+            'Content-Length': 47,
+            'Host': 'tech04.yoha.pro',
+            'Connection': 'Keep-Alive',
+            'Accept-Encoding': 'gzip',
+            'User-Agent': 'okhttp/5.0.0-alpha.2'
+        }
+   })
+   .then(res => res.json())
+   .then(result => {
+       resolve(result);
+   })
+   .catch(err => reject(err))
+});
+
 (async () => {
     try {
         const randIp = `${randomize('0', 3)}.${randomize('0', 3)}.${randomize('0', 2)}.${randomize('0', 2)}`
@@ -98,7 +161,19 @@ const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, rejec
             const claim = await functionClaim(randIp, totalClaim, token)
             if(checkTask.code == 200 && claim.code == 200){
                 console.log(`Claim harian sukses, reward : ${claim.data.amount}`)
-                console.log("")
+                const getUser = await functionGetDetailUserLive(randIp, token)
+                var randomUser = getUser.data.list[Math.floor(Math.random()*getUser.data.list.length)]
+                const streamId = randomUser.stream
+                const liveId = randomUser.uid
+    
+                const sendGift = await functionSendGift(randIp, token, streamId, liveId)
+                if(sendGift.code == 200){
+                    console.log(`Berhasil send gift ke ${randomUser.user_nicename}`)
+                    console.log("")
+                } else {
+                    console.log("Gagal send gift, saldo mungkin kurang.")
+                    console.log("")
+                }
             } else {
                 console.log("CLaim gagal, coba esok hari")
                 console.log("")
