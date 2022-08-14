@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "crypto": "^1.0.1",
+    "fs-extra": "^10.1.0",
     "node-fetch": "^2.6.1",
     "randomatic": "^3.1.1",
     "readline-sync": "^1.4.10"
