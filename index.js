@@ -2,6 +2,7 @@ const fetch = require('node-fetch')
 var randomize = require('randomatic');
 const crypto = require('crypto');
 const readline = require('readline-sync');
+const fs = require('fs-extra');
 
 const functionSendOtp = (randIp, nomor) => new Promise((resolve, reject) => {
     const bodys = {
@@ -227,11 +228,11 @@ const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, rejec
     
             const sendOtp = await functionSendOtp(randIp, nomor)
             if(sendOtp.status == 'success'){
-                console.log("OTP berhasil dikirim")
+                console.log(`OTP berhasil dikirim`)
                 const otp = readline.question("OTP : ")
                 const register = await functionRegister(randIp, nomor, reffCode, otp)
                 if(register.status == 'success'){
-                    console.log("Reff sukses")
+                    console.log("Berhasil mendaftar")
                     const login = await functionLogin(randIp, nomor)
                     if(login.code == 200){
                         console.log("Login sukses")
@@ -252,9 +253,13 @@ const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, rejec
                             const sendGift = await functionSendGift(randIp, token, streamId, liveId)
                             if(sendGift.code == 200){
                                 console.log(`Berhasil send gift ke ${randomUser.user_nicename}`)
+                                await fs.appendFile('./listNo.txt',`${nomor}|jajang908`+'\r\n', err => {
+                                    if (err) throw err;
+                                })
+                                console.log(`Info akun disimpan di listNo.txt`)
                                 console.log("")
                             } else {
-                                console.log("Gagal send gift, saldo mungkin kurang.")
+                                console.log(`Gagal send gift, ${sendGift.message}`)
                                 console.log("")
                             }
                         } else {
@@ -262,15 +267,15 @@ const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, rejec
                             console.log("")
                         }
                     } else {
-                        console.log("Login gagal, password atau nomor salah.")
+                        console.log(`Login gagal, ${login.message}`)
                         console.log("")
                     }
                 } else {
-                    console.log("Reff gagal")
+                    console.log(`Gagal mendaftar, ${register.message}`)
                     console.log("")
                 }
             } else {
-                console.log("OTP gagal dikirim")
+                console.log(`OTP gagal dikirim, ${sendOtp.message}`)
                 console.log("")
             }
         } catch (error) {
