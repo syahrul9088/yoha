@@ -158,7 +158,7 @@ const functionSendGift = (randIp, token, streamId, liveId) => new Promise((resol
             const nomor = toArray[i].split('|')[0]
             const password = toArray[i].split('|')[1]
 
-            console.log(`Mencoba login ${nomor}|${password}`)
+            console.log(`Mencoba login ${nomor} | ${password}`)
 
             const login = await functionLogin(randIp, nomor, password)
             if(login.code == 200){
