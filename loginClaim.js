@@ -150,15 +150,15 @@ const functionSendGift = (randIp, token, streamId, liveId) => new Promise((resol
 (async () => {
     try {
         const randIp = `${randomize('0', 3)}.${randomize('0', 3)}.${randomize('0', 2)}.${randomize('0', 2)}`
-        const file = readline.question('Nama file (ex: listNo): ')
+        const file = readline.question('Nama file (ex: listNo.txt): ')
 
-        const listNo = await fs.readFile(`./${file}.txt`, "utf-8")
+        const listNo = await fs.readFile(`./${file}`, "utf-8")
         const toArray = listNo.split('\r\n')
         for(var i in toArray){
             const nomor = toArray[i].split('|')[0]
             const password = toArray[i].split('|')[1]
 
-            console.log(`Mencoba login ${nomor} | ${password}`)
+            console.log(`Mencoba login ${nomor}|${password}`)
 
             const login = await functionLogin(randIp, nomor, password)
             if(login.code == 200){
