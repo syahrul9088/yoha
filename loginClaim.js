@@ -1,11 +1,12 @@
 const fetch = require('node-fetch')
 var randomize = require('randomatic');
 const readline = require('readline-sync');
+const fs = require('fs-extra');
 
-const functionLogin = (randIp, nomor) => new Promise((resolve, reject) => {
+const functionLogin = (randIp, nomor, password) => new Promise((resolve, reject) => {
     const bodys = {
         "user_login":`62${nomor}`,
-        "user_pass":"jajang908",
+        "user_pass":password,
         "user_email":"",
         "source":"android",
         "ip":randIp,
@@ -149,38 +150,47 @@ const functionSendGift = (randIp, token, streamId, liveId) => new Promise((resol
 (async () => {
     try {
         const randIp = `${randomize('0', 3)}.${randomize('0', 3)}.${randomize('0', 2)}.${randomize('0', 2)}`
-        const nomor = readline.question('Nomor (ex: 819XXXX): ')
-    
-        const login = await functionLogin(randIp, nomor)
-        if(login.code == 200){
-            console.log("Login sukses")
-            const token = login.data.access_token
-            const checkTask = await functionCheckTask(randIp, token)
-            const totalClaim = checkTask.data.toDayStatus + 1
-            console.log(`Reward yang telah diclaim : ${checkTask.data.toDayStatus} hari`)
-            const claim = await functionClaim(randIp, totalClaim, token)
-            if(checkTask.code == 200 && claim.code == 200){
-                console.log(`Claim harian sukses, reward : ${claim.data.amount}`)
-                const getUser = await functionGetDetailUserLive(randIp, token)
-                var randomUser = getUser.data.list[Math.floor(Math.random()*getUser.data.list.length)]
-                const streamId = randomUser.stream
-                const liveId = randomUser.uid
-    
-                const sendGift = await functionSendGift(randIp, token, streamId, liveId)
-                if(sendGift.code == 200){
-                    console.log(`Berhasil send gift ke ${randomUser.user_nicename}`)
-                    console.log("")
+        const file = readline.question('Nama file (ex: listNo): ')
+
+        const listNo = await fs.readFile(`./${file}.txt`, "utf-8")
+        const toArray = listNo.split('\r\n')
+        for(var i in toArray){
+            const nomor = toArray[i].split('|')[0]
+            const password = toArray[i].split('|')[1]
+
+            console.log(`Mencoba login ${nomor}|${password}`)
+
+            const login = await functionLogin(randIp, nomor, password)
+            if(login.code == 200){
+                console.log("Login sukses")
+                const token = login.data.access_token
+                const checkTask = await functionCheckTask(randIp, token)
+                const totalClaim = checkTask.data.toDayStatus + 1
+                console.log(`Reward yang telah diclaim : ${checkTask.data.toDayStatus} hari`)
+                const claim = await functionClaim(randIp, totalClaim, token)
+                if(checkTask.code == 200 && claim.code == 200){
+                    console.log(`Claim harian sukses, reward : ${claim.data.amount}`)
+                    const getUser = await functionGetDetailUserLive(randIp, token)
+                    var randomUser = getUser.data.list[Math.floor(Math.random()*getUser.data.list.length)]
+                    const streamId = randomUser.stream
+                    const liveId = randomUser.uid
+        
+                    const sendGift = await functionSendGift(randIp, token, streamId, liveId)
+                    if(sendGift.code == 200){
+                        console.log(`Berhasil send gift ke ${randomUser.user_nicename}`)
+                        console.log("")
+                    } else {
+                        console.log(`Gagal send gift, ${sendGift.message}`)
+                        console.log("")
+                    }
                 } else {
-                    console.log("Gagal send gift, saldo mungkin kurang.")
+                    console.log("Claim gagal, coba esok hari")
                     console.log("")
                 }
             } else {
-                console.log("CLaim gagal, coba esok hari")
+                console.log(`Login gagal, ${login.message}`)
                 console.log("")
             }
-        } else {
-            console.log("Login gagal, password atau nomor salah.")
-            console.log("")
         }
     } catch (error) {
         console.log(error);
