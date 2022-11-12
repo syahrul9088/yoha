@@ -2,6 +2,7 @@ const fetch = require('node-fetch')
 var randomize = require('randomatic');
 const readline = require('readline-sync');
 const fs = require('fs-extra');
+const getIPRange = require('get-ip-range');
 
 const functionLogin = (randIp, nomor, password) => new Promise((resolve, reject) => {
     const bodys = {
@@ -149,16 +150,23 @@ const functionSendGift = (randIp, token, streamId, liveId) => new Promise((resol
 
 (async () => {
     try {
-        const randIp = `${randomize('0', 3)}.${randomize('0', 3)}.${randomize('0', 2)}.${randomize('0', 2)}`
         const file = readline.question('Nama file (ex: listNo.txt): ')
 
         const listNo = await fs.readFile(`./${file}`, "utf-8")
         const toArray = listNo.split('\r\n')
         for(var i in toArray){
+
+            const listIp = await JSON.parse(fs.readFileSync('./ip.json'))  
+            const chooseIp = listIp[Math.floor(Math.random()*listIp.length)]
+            const start = chooseIp.start
+            const end = chooseIp.end
+            const genIp = getIPRange(`${start}`, `${end}`);
+            const randIp = genIp[Math.floor(Math.random()*genIp.length)]
+
             const nomor = toArray[i].split('|')[0]
             const password = toArray[i].split('|')[1]
 
-            console.log(`Mencoba login ${nomor}|${password}`)
+            console.log(`Mencoba login ${nomor}|${password} => IP address ${randIp}`)
 
             const login = await functionLogin(randIp, nomor, password)
             if(login.code == 200){
