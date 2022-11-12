@@ -11,7 +11,7 @@ const functionLogin = (randIp, nomor, password) => new Promise((resolve, reject)
         "user_email":"",
         "source":"android",
         "ip":randIp,
-        "v":"2.0.7.2",
+        "v":"2.1.2.2",
         "l":"in"
     }
 
@@ -36,7 +36,7 @@ const functionLogin = (randIp, nomor, password) => new Promise((resolve, reject)
 });
 
 const functionCheckTask = (randIp, token) => new Promise((resolve, reject) => {
-    fetch(`https://api.yoha.pro/api/signs/init?ip=${randIp}&v=2.0.7.2&l=in`, { 
+    fetch(`https://api.yoha.pro/api/signs/init?ip=${randIp}&v=2.1.2.2&l=in`, { 
         method: 'GET', 
         headers: {
             'X-Forwarded-For': `${randIp}`,
@@ -58,11 +58,11 @@ const functionCheckTask = (randIp, token) => new Promise((resolve, reject) => {
 const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, reject) => {
     const bodys = {
         "ip":randIp,
-        "v":"2.0.7.2",
+        "v":"2.1.2.2",
         "l":"in"
     }
 
-    fetch(`https://api.yoha.pro/api/signs/store?day=${totalClaim}&sign_id=${totalClaim}&ip=${randIp}&v=2.0.7.2&l=in`, { 
+    fetch(`https://api.yoha.pro/api/signs/store?day=${totalClaim}&sign_id=${totalClaim}&ip=${randIp}&v=2.1.2.2&l=in`, { 
         method: 'POST', 
         body: JSON.stringify(bodys),
         headers: {
@@ -87,11 +87,11 @@ const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, rejec
 const functionGetDetailUserLive = (randIp, token) => new Promise((resolve, reject) => {
     const bodys = {
         "ip":randIp,
-        "v":"2.0.7.2",
+        "v":"2.1.2.2",
         "l":"in"
     }
 
-    fetch(`https://tech04.yoha.pro/live/list?type=0&page=1&per_page=9&ip=${randIp}&v=2.0.7.2&l=in`, { 
+    fetch(`https://tech04.yoha.pro/live/list?type=0&page=1&per_page=9&ip=${randIp}&v=2.1.2.2&l=in`, { 
         method: 'POST', 
         body: JSON.stringify(bodys),
         headers: {
@@ -122,7 +122,7 @@ const functionSendGift = (randIp, token, streamId, liveId) => new Promise((resol
         "stream":streamId,
         "live_uid":liveId,
         "ip":randIp,
-        "v":"2.0.7.2",
+        "v":"2.1.2.2",
         "l":"in"
     }
 
