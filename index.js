@@ -3,6 +3,7 @@ var randomize = require('randomatic');
 const crypto = require('crypto');
 const readline = require('readline-sync');
 const fs = require('fs-extra');
+const getIPRange = require('get-ip-range');
 
 const functionSendOtp = (randIp, nomor) => new Promise((resolve, reject) => {
     const bodys = {
@@ -223,8 +224,15 @@ const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, rejec
 
     for(var i = 0; i < jmlReff; i++){
         try {
-            const randIp = `${randomize('0', 3)}.${randomize('0', 3)}.${randomize('0', 2)}.${randomize('0', 2)}`
+            const listIp = await JSON.parse(fs.readFileSync('./ip.json'))  
+            const chooseIp = listIp[Math.floor(Math.random()*listIp.length)]
+            const start = chooseIp.start
+            const end = chooseIp.end
+            const genIp = getIPRange(`${start}`, `${end}`);
+            const randIp = genIp[Math.floor(Math.random()*genIp.length)]
             const nomor = readline.question('Nomor (ex: 819XXXX): ')
+
+            console.log(`Mencoba regist 0${nomor} => IP address ${randIp}`)
     
             const sendOtp = await functionSendOtp(randIp, nomor)
             if(sendOtp.status == 'success'){
