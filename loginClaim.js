@@ -4,28 +4,31 @@ const readline = require('readline-sync');
 const fs = require('fs-extra');
 const getIPRange = require('get-ip-range');
 
-const functionLogin = (randIp, nomor, password) => new Promise((resolve, reject) => {
+const functionSendOtp = (randIp, nomor) => new Promise((resolve, reject) => {
     const bodys = {
-        "user_login":`62${nomor}`,
-        "user_pass":password,
-        "user_email":"",
-        "source":"android",
-        "ip":randIp,
-        "v":"2.1.2.2",
-        "l":"in"
+        "mobile":`62${nomor}`,
+        "tag":"register"
     }
 
-    fetch(`https://api.yoha.pro/api/auth/login`, { 
+    fetch(`https://php.btliveroom.live/api/sms/verify-code`, { 
         method: 'POST', 
         body: JSON.stringify(bodys),
         headers: {
-            'X-Forwarded-For': `${randIp}`,
-            'Host': 'api.yoha.pro',
-            'accept': 'application/json',
-            'content-type': 'application/json; charset=utf-8',
-            'content-length': 87,
+            'source': 'android',
+            'user-agent': 'Dart/2.18 (dart:io)',
+            'ip': randIp,
             'accept-encoding': 'gzip',
-            'user-agent': 'okhttp/5.0.0-alpha.2'
+            'currency': 'Rp',
+            'content-type': 'application/json; charset=utf-8',
+            'tenant': '1001',
+            'time-zone': 'GMT+7',
+            'country': 'idn',
+            'accept': 'application/json',
+            'region': '',
+            'content-length': 43,
+            'v': '1.0.0',
+            'host': 'php.btliveroom.live',
+            'l': 'in'
         }
    })
    .then(res => res.json())
@@ -35,46 +38,43 @@ const functionLogin = (randIp, nomor, password) => new Promise((resolve, reject)
    .catch(err => reject(err))
 });
 
-const functionCheckTask = (randIp, token) => new Promise((resolve, reject) => {
-    fetch(`https://api.yoha.pro/api/signs/init?ip=${randIp}&v=2.1.2.2&l=in`, { 
-        method: 'GET', 
-        headers: {
-            'X-Forwarded-For': `${randIp}`,
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Host': 'api.yoha.pro',
-            'Connection': 'Keep-Alive',
-            'Accept-Encoding': 'gzip',
-            'User-Agent': 'okhttp/5.0.0-alpha.2'
-        }
-   })
-   .then(res => res.json())
-   .then(result => {
-       resolve(result);
-   })
-   .catch(err => reject(err))
-});
+const functionRegister = (randIp, nomor, reffCode, otp) => new Promise((resolve, reject) => {
 
-const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, reject) => {
+    const time = new Date().getTime()
+    const unique_code = `${time}-${randomize("0", 19)}`
+    const guest_code = `${time}${randomize("0", 10)}`
+
     const bodys = {
-        "ip":randIp,
-        "v":"2.1.2.2",
-        "l":"in"
+        "device_code": "",
+        "channel_code": "1",
+        "code": otp,
+        "unique_code": unique_code,
+        "guest_code": guest_code,
+        "pasteboard": `\"device_code\": \"\",\n  \"channel_code\": \"1\",\n  \"code\": \"${reffCode}\",\n  \"unique_code\": \"${unique_code}\",\n  \"guest_code\": \"${guest_code}\",\n  \"pasteboard\": \"https://java.btliveroom.live/auth/v1.0/register\",\n  \"referral_code\": \"${reffCode}\",\n  \"user_login\": \"62${nomor}\",\n  \"user_pass\": \"jajang908\"`,
+        "referral_code": reffCode,
+        "user_login": `62${nomor}`,
+        "user_pass": "jajang908"
     }
 
-    fetch(`https://api.yoha.pro/api/signs/store?day=${totalClaim}&sign_id=${totalClaim}&ip=${randIp}&v=2.1.2.2&l=in`, { 
+    fetch(`https://java.btliveroom.live/auth/v1.0/register`, { 
         method: 'POST', 
         body: JSON.stringify(bodys),
         headers: {
-            'X-Forwarded-For': `${randIp}`,
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
-            'Content-Length': 47,
-            'Host': 'api.yoha.pro',
-            'Connection': 'Keep-Alive',
-            'Accept-Encoding': 'gzip',
-            'User-Agent': 'okhttp/5.0.0-alpha.2'
+            'source': 'android',
+            'user-agent': 'Dart/2.18 (dart:io)',
+            'ip': randIp,
+            'accept-encoding': 'gzip',
+            'currency': 'Rp',
+            'content-type': 'application/json; charset=utf-8',
+            'tenant': '1001',
+            'time-zone': 'GMT+7',
+            'country': 'idn',
+            'accept': 'application/json',
+            'region': '',
+            'content-length': 43,
+            'v': '1.0.0',
+            'host': 'php.btliveroom.live',
+            'l': 'in'
         }
    })
    .then(res => res.json())
@@ -84,61 +84,31 @@ const functionClaim = (randIp, totalClaim, token) => new Promise((resolve, rejec
    .catch(err => reject(err))
 });
 
-const functionGetDetailUserLive = (randIp, token) => new Promise((resolve, reject) => {
+const functionLogin = (randIp, nomor) => new Promise((resolve, reject) => {
     const bodys = {
-        "ip":randIp,
-        "v":"2.1.2.2",
-        "l":"in"
+        "user_login": `62${nomor}`,
+        "user_pass": 'jajang908'
     }
 
-    fetch(`https://tech04.yoha.pro/live/list?type=0&page=1&per_page=9&ip=${randIp}&v=2.1.2.2&l=in`, { 
+    fetch(`https://java.btliveroom.live/auth/v1.0/login`, { 
         method: 'POST', 
         body: JSON.stringify(bodys),
         headers: {
-            'X-Forwarded-For': `${randIp}`,
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
-            'Content-Length': 47,
-            'Host': 'tech04.yoha.pro',
-            'Connection': 'Keep-Alive',
-            'Accept-Encoding': 'gzip',
-            'User-Agent': 'okhttp/5.0.0-alpha.2'
-        }
-   })
-   .then(res => res.json())
-   .then(result => {
-       resolve(result);
-   })
-   .catch(err => reject(err))
-});
-
-const functionSendGift = (randIp, token, streamId, liveId) => new Promise((resolve, reject) => {
-    const bodys = {
-        "gift_id":"3",
-        "num":"1",
-        "type":"0",
-        "combo":"false",
-        "stream":streamId,
-        "live_uid":liveId,
-        "ip":randIp,
-        "v":"2.1.2.2",
-        "l":"in"
-    }
-
-    fetch(`https://tech04.yoha.pro/live/sendGift`, { 
-        method: 'POST', 
-        body: JSON.stringify(bodys),
-        headers: {
-            'X-Forwarded-For': `${randIp}`,
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
-            'Content-Length': 47,
-            'Host': 'tech04.yoha.pro',
-            'Connection': 'Keep-Alive',
-            'Accept-Encoding': 'gzip',
-            'User-Agent': 'okhttp/5.0.0-alpha.2'
+            'source': 'android',
+            'user-agent': 'Dart/2.18 (dart:io)',
+            'ip': randIp,
+            'accept-encoding': 'gzip',
+            'currency': 'Rp',
+            'content-type': 'application/json; charset=utf-8',
+            'tenant': '1001',
+            'time-zone': 'GMT+7',
+            'country': 'idn',
+            'accept': 'application/json',
+            'region': '',
+            'content-length': 53,
+            'v': '1.0.0',
+            'host': 'java.btliveroom.live',
+            'l': 'in'
         }
    })
    .then(res => res.json())
@@ -149,58 +119,47 @@ const functionSendGift = (randIp, token, streamId, liveId) => new Promise((resol
 });
 
 (async () => {
-    try {
-        const file = readline.question('Nama file (ex: listNo.txt): ')
+    var reffCode = readline.question("Kode reff : ")
+    var jmlReff = readline.question("Jumlah reff: ")
 
-        const listNo = await fs.readFile(`./${file}`, "utf-8")
-        const toArray = listNo.split('\r\n')
-        for(var i in toArray){
+    console.log("")
 
+    for(var i = 0; i < jmlReff; i++){
+        try {
             const listIp = await JSON.parse(fs.readFileSync('./ip.json'))  
             const chooseIp = listIp[Math.floor(Math.random()*listIp.length)]
             const start = chooseIp.start
             const end = chooseIp.end
             const genIp = getIPRange(`${start}`, `${end}`);
             const randIp = genIp[Math.floor(Math.random()*genIp.length)]
+            const nomor = readline.question('Nomor (ex: 819XXXX): ')
 
-            const nomor = toArray[i].split('|')[0]
-            const password = toArray[i].split('|')[1]
-
-            console.log(`Mencoba login ${nomor}|${password} => IP address ${randIp}`)
-
-            const login = await functionLogin(randIp, nomor, password)
-            if(login.code == 200){
-                console.log("Login sukses")
-                const token = login.data.access_token
-                const checkTask = await functionCheckTask(randIp, token)
-                const totalClaim = checkTask.data.toDayStatus + 1
-                console.log(`Reward yang telah diclaim : ${checkTask.data.toDayStatus} hari`)
-                const claim = await functionClaim(randIp, totalClaim, token)
-                if(checkTask.code == 200 && claim.code == 200){
-                    console.log(`Claim harian sukses, reward : ${claim.data.amount}`)
-                    const getUser = await functionGetDetailUserLive(randIp, token)
-                    var randomUser = getUser.data.list[Math.floor(Math.random()*getUser.data.list.length)]
-                    const streamId = randomUser.stream
-                    const liveId = randomUser.uid
-        
-                    const sendGift = await functionSendGift(randIp, token, streamId, liveId)
-                    if(sendGift.code == 200){
-                        console.log(`Berhasil send gift ke ${randomUser.user_nicename}`)
-                        console.log("")
+            console.log(`Mencoba regist 0${nomor} => IP address ${randIp}`)
+    
+            const sendOtp = await functionSendOtp(randIp, nomor)
+            if(sendOtp.status == 'success'){
+                console.log(`OTP berhasil dikirim`)
+                const otp = readline.question("OTP : ")
+                const register = await functionRegister(randIp, nomor, reffCode, otp)
+                if(register.status == 'success'){
+                    console.log("Berhasil mendaftar")
+                    const login = await functionLogin(randIp, nomor)
+                    if(login.code == 200){
+                        console.log(`Login sukses | ID => ${login.data.user_info.id}`)
                     } else {
-                        console.log(`Gagal send gift, ${sendGift.message}`)
+                        console.log(`Login gagal, ${login.message}`)
                         console.log("")
                     }
                 } else {
-                    console.log("Claim gagal, coba esok hari")
+                    console.log(`Gagal mendaftar, ${register.message}`)
                     console.log("")
                 }
             } else {
-                console.log(`Login gagal, ${login.message}`)
+                console.log(`OTP gagal dikirim, ${sendOtp.message}`)
                 console.log("")
             }
+        } catch (error) {
+            console.log(error);
         }
-    } catch (error) {
-        console.log(error);
     }
 })();
