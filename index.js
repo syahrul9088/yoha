@@ -146,6 +146,9 @@ const functionLogin = (randIp, nomor) => new Promise((resolve, reject) => {
                     const login = await functionLogin(randIp, nomor)
                     if(login.code == 200){
                         console.log(`Login sukses | ID => ${login.data.user_info.id}`)
+                        await fs.appendFile('./listNo.txt',`${nomor}|jajang908`+'\r\n', err => {
+                            if (err) throw err;
+                        })
                     } else {
                         console.log(`Login gagal, ${login.message}`)
                         console.log("")
